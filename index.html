@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <title>Shelf - Javascript SDK Example</title>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@shelf/agent-assist-sdk@3.6.0/lib/agent-assist.min.js"></script>
+        <style type="text/css">
+            body {
+                font: normal 12px Verdana, Arial, sans-serif;
+            }
+            iframe {
+                width: 100%;
+                height: 100%;
+                border: 0px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Shelf - Javascript SDK Example</h1>
+        <table>
+            <tr>
+                <td colspan="7">Tabs</td>
+            </tr>
+            <tr>
+                <td><button id="tab1" onclick="openTab('suggestions')">Suggestions</button></td>
+                <td><button id="tab4" onclick="openTab('favorites')">Favorites</button></td>
+                <td><button id="tab2" onclick="openTab('search')">Search</button></td>
+                <td><button id="tab3" onclick="openTab('gem')">Gem</button></td>
+                <td><button id="tab5" onclick="openTab('announcements')">Announcements</button></td>
+                <td><button id="tab6" onclick="openTab('links')">Links</button></td>
+                <td><button id="tab7" onclick="openTab('settings')">Settings</button></td>
+            </tr>
+        </table>
+        <table>
+            <!--<tr>
+                <td colspan="2">Context Suggestions</td>
+                <td><button id="contextSug1" style="display: none;" onclick="ContextSuggestions('New Member')">New Member</button></td>
+                <td><button id="contextSug2" style="display: none;" onclick="ContextSuggestions('Existing Member')">Existing Member</button></td>
+            </tr>-->
+            <tr>
+                <td colspan="3">Searching</td>
+            </tr>
+            <tr>
+                <td><input type="text" id="searchString"/></td>
+                <td><button id="applySearchBtn" style="display: none;" onclick="searchShelf()">Apply Search Method</button></td>
+                <td><button id="setMessageBtn" style="display: none;" onclick="setMessage()">Set Messsages Method (AA)</button></td>
+            </tr>
+        </table>
+        </br>
+        <div id=agent_assist></div>
+
+        <script>
+            config = {
+                configurationId: '01HY1ECXJRMN9RGA7JB9VSYNMK', // CHANGE THIS TO YOUR CONFIGURATION ID
+                shelfDomain: 'shelf.io',
+                suggestions: {
+                    enabled: true
+                },
+                announcements: {
+                    enabled: true
+                },
+                favorites: {
+                    enabled: true
+                },
+                telemetry: {
+                    systemname: "genesys_cloud"
+                }
+            }
+            async function initializeAA() {
+                await shelf.AgentAssist.initialize(document.getElementById('agent_assist'), config)
+                console.log("Shelf Initialized");
+                
+                // Enable buttons when Shelf is initialized
+                //document.getElementById("contextSug1").style.display = "block";
+                //document.getElementById("contextSug2").style.display = "block";
+                document.getElementById("setMessageBtn").style.display = "block";
+                document.getElementById("applySearchBtn").style.display = "block";
+            }
+            
+            initializeAA();
+
+            function ContextSuggestions(contextReason) {
+                console.log("getContextSuggestions");
+                shelf.AgentAssist.getContextSuggestions({
+                    Case: {
+                        //Reason: "transfer.money" // CHANGE THIS TO YOUR CASE REASON
+                        Reason: contextReason
+                    }
+                });
+            }
+
+            function setMessage() {
+                shelf.AgentAssist.setMessages([
+                {text: document.getElementById("searchString").value, senderType: 'client'},]);
+
+                shelf.AgentAssist.openTab('suggestions');
+            }
+            
+            function searchShelf() {
+                shelf.AgentAssist.applySearch({
+                    query: document.getElementById("searchString").value
+                })
+                shelf.AgentAssist.openTab('search');
+            }
+
+            function openTab(tabName) {
+                shelf.AgentAssist.openTab(tabName);
+            }
+        </script>
+    </body>
+</html>
